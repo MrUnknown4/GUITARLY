@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TabMaster Pro - Guitar Sheet Music to Tab Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Fira+Sans:wght@300;400;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #8a2be2;
+            --accent-color: #ffd700;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+        }
+
+        body {
+            font-family: 'Fira Sans', sans-serif;
+            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .music-nav {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2d2d2d 100%);
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.2);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .branding {
+            display: flex;
+            align-items: center;
+        }
+
+        .branding img {
+            height: 40px;
+            margin-right: 1rem;
+        }
+
+        .branding h1 {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .nav-items {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin: 0 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-color);
+        }
+
+        .music-player {
+            display: flex;
+            align-items: center;
+        }
+
+        #playPause {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        #volume {
+            width: 100px;
+            margin-left: 1rem;
+        }
+
+        main {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #converter {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-panel, .output-panel {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .file-dropzone {
+            border: 2px dashed var(--secondary-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .fretboard-container {
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            height: 200px;
+            background: url('wood-texture.jpg');
+            background-size: cover;
+        }
+
+        .tab-preview {
+            font-family: 'Source Code Pro', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .convert-btn {
+            background: linear-gradient(90deg, var(--secondary-color) 0%, #6a1b9a 100%);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .convert-btn:hover {
+            transform: scale(1.05) rotate(3deg);
+        }
+
+        #faq {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .faq-card {
+            margin-bottom: 1rem;
+        }
+
+        .question {
+            background: rgba(138, 43, 226, 0.2);
+            padding: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .answer {
+            padding: 1rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            #converter {
+                flex-direction: column;
+            }
+
+            .music-nav {
+                flex-direction: column;
+            }
+
+            .nav-items {
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="music-nav">
+        <div class="branding">
+            <img src="https://c.superprof.com/i/a/34262716/147940348/600/20241225024107/high-school-student-waterloo-ontario-have-been-playing-guitar-for-years-played-the-pit-band-for-the-recent-musical-laurel.jpg" alt="SuperTabs Pro Logo">
+            <h1>SuperTabs Pro</h1>
+        </div>
+        
+        <div class="nav-items">
+            <a href="#converter" class="nav-link active">
+                <i class="fas fa-file-import"></i> Converter
+            </a>
+            <a href="#faq" class="nav-link">
+                <i class="fas fa-question-circle"></i> FAQ
+            </a>
+            <div class="music-player">
+                <button id="playPause">
+                    <i class="fas fa-play"></i>
+                </button>
+                <input type="range" id="volume" min="0" max="1" step="0.1">
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="converter">
+            <div class="input-panel">
+                <div class="file-dropzone">
+                    <h3>Upload Sheet Music</h3>
+                    <input type="file" accept=".pdf,.png,.jpg,.musicxml">
+                </div>
+                
+                <div class="fretboard-container">
+                    <div class="virtual-fretboard" data-frets="22">
+                        <!-- Dynamic fretboard SVG will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-panel">
+                <div class="tab-preview">
+                    <pre>e|---------------------|
+B|---------------------|
+G|---------------------|
+D|---------------------|
+A|---------------------|
+E|---------------------|</pre>
+                </div>
+                
+                <div class="controls">
+                    <button class="convert-btn">
+                        <i class="fas fa-magic"></i> Generate Tabs
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq">
+            <h2>Frequently Asked Questions</h2>
+            
+            <div class="faq-card">
+                <div class="question">
+                    <h3>Supported File Formats</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="answer">
+                    <p>Our system currently supports:</p>
+                    <ul>
+                        <li>PDF (Vector-based sheet music)</li>
+                        <li>High-resolution images (PNG/JPEG)</li>
+                        <li>MusicXML 3.0 format</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-card">
+                <div class="question">
+                    <h3>Supported Guitar Tunings</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="answer">
+                    <p>The system currently supports:</p>
+                    <ul>
+                        <li>Standard (EADGBE)</li>
+                        <li>Drop D</li>
+                        <li>Open G</li>
+                    </ul>
+                    <p>Custom tuning support is planned for Q2 2025.</p>
+                </div>
+            </div>
+
+            <div class="faq-card">
+                <div class="question">
+                    <h3>Conversion Accuracy</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="answer">
+                    <p>Our AI-powered recognition system achieves 94.7% accuracy on clean sheet music, with manual override capabilities for complex passages.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Simple FAQ toggle functionality
+        document.querySelectorAll('.question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+
+        // Placeholder for conversion functionality
+        document.querySelector('.convert-btn').addEventListener('click', () => {
+            alert('Conversion functionality will be implemented here.');
+        });
+    </script>
+
+    <!-- Add after the tab preview section -->
+<script>
+    document.querySelector('.file-dropzone input').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+    
+        try {
+            const response = await fetch('/convert', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            document.querySelector('.tab-preview pre').textContent = result.tab;
+            
+            // Animate fretboard
+            animateFretboard(result.tab);
+            
+        } catch (error) {
+            console.error('Conversion error:', error);
+            alert(`Conversion failed: ${error.message}`);
+        }
+    });
+    
+    function animateFretboard(tab) {
+        const fretboard = document.querySelector('.virtual-fretboard');
+        const strings = tab.split('\n').reverse();
+        
+        // Clear existing fretboard
+        fretboard.innerHTML = '';
+        
+        // Create SVG fretboard
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute('width', '100%');
+        svg.setAttribute('height', '100%');
+        
+        // Draw frets
+        for (let i = 0; i <= 22; i++) {
+            const fret = document.createElementNS(svgNS, 'line');
+            fret.setAttribute('x1', `${(i/22)*100}%`);
+            fret.setAttribute('y1', '0%');
+            fret.setAttribute('x2', `${(i/22)*100}%`);
+            fret.setAttribute('y2', '100%');
+            fret.setAttribute('stroke', '#8a2be2');
+            svg.appendChild(fret);
+        }
+        
+        // Draw notes
+        strings.forEach((string, strIdx) => {
+            const matches = string.matchAll(/(\d+)/g);
+            for (const match of matches) {
+                const fret = parseInt(match[0]);
+                const note = document.createElementNS(svgNS, 'circle');
+                note.setAttribute('cx', `${(fret/22)*100}%`);
+                note.setAttribute('cy', `${(strIdx/5)*100}%`);
+                note.setAttribute('r', '3%');
+                note.setAttribute('fill', '#ffd700');
+                note.setAttribute('class', 'animated-note');
+                svg.appendChild(note);
+            }
+        });
+        
+        fretboard.appendChild(svg);
+    }
+    </script>
+    
+</body>
+</html>
